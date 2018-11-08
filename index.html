@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="squares"></canvas>
+
+    <script>
+        var c = document.getElementById("squares");
+        var ctx = c.getContext("2d");
+
+        let SquareBackground = {
+            squareDimensions: 20,
+            screenWidth: 2000,
+            screenHeight: 1500,
+            animationTimeMs: 1,
+            randomIntFromInterval: function (min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            },
+            drawSquare: function (x, y, strategy) {
+                switch (strategy) {
+                    case "gradient":
+                        var grd = ctx.createLinearGradient(x, y, x + this.squareDimensions, y);
+                        grd.addColorStop(0, `rgb(2, ${this.randomIntFromInterval(120, 150)}, 195)`);
+                        grd.addColorStop(1, `rgb(2, ${this.randomIntFromInterval(150, 180)}, 195)`);
+
+                        ctx.fillStyle = grd;
+                        ctx.fillRect(x, y, this.squareDimensions, this.squareDimensions);
+                        break;
+
+                    case "plain":
+                        ctx.save()
+                        ctx.fillStyle = `rgb(2, ${this.randomIntFromInterval(120, 150)}, 195)`;
+                        ctx.fillRect(x, y, this.squareDimensions, this.squareDimensions);
+                        ctx.restore()
+                        break;
+                }
+            },
+            setCanvasDimensions: function () {
+                document.querySelector("#squares").setAttribute('width', this.screenWidth)
+                document.querySelector("#squares").setAttribute('height', this.screenHeight)
+            },
+            drawAnimatedSquares: function (strategy) {
+                this.setCanvasDimensions()
+
+                var r = 0;
+                var c = 0;
+
+                var intervalID = setInterval(function () {
+                    this.drawSquare(r, c, strategy);
+
+                    r += this.squareDimensions
+
+                    if (r > this.screenWidth) {
+                        r = 0;
+                        c+=this.squareDimensions
+                    }
+
+                    if (c > this.screenHeight)  clearInterval(intervalID)
+                }.bind(this), this.animationTimeMs)
+
+            },
+            drawAllSquares: function (strategy) {
+                this.setCanvasDimensions()
+
+                for (var r = 0; r < this.screenWidth; r += this.squareDimensions) {
+                    for (var c = 0; c < this.screenWidth; c += this.squareDimensions) {
+                        this.drawSquare(r, c, strategy)
+                    }
+                }
+            }
+        }
+
+        SquareBackground.drawAnimatedSquares("gradient")
+    </script>
+</body>
+
+</html>
